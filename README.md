@@ -9,7 +9,7 @@ Code Repository for the ICCAD 2026 Paper "Invisible Hands: Gray-Box Bit Flip Att
 Setup the environment:
 
 ```bash
-cd Invisible_Hands
+cd Invisible-Hands
 conda env create -f environment.yml
 conda activate invisible-hands
 cd Invisible-Hands/modules/eval

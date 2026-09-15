@@ -1,0 +1,49 @@
+system:
+  device: cuda
+  pipeline:
+    enable_pipeline: false
+    pipeline_nodes: [ 0,1 ]
+    size_mbs: 2
+
+model:
+  name: mistralai/Mistral-7B-v0.3
+  alias: &global_model_name Mistral-7B-v0.3-4bit
+  torch_dtype: bfloat16    
+  model_peft: false
+  load_in_8bit: false
+  load_in_4bit: true  
+
+task:
+  seed: 0
+  task_mode: flip
+  flip:
+    flip_dataset:
+      type: downstream  
+      name: arc_easy 
+      seq_len: 256
+    flip_metric: BFA_int4
+    func_name: bfa
+    max_iter: 50
+    threshold: 0.25
+    critical_layer_index: [1]
+    custom_flip: true
+    custom_config:
+      custom_package_location: ./Flippers
+  output_folder: &output_folder !join ['./Expermintal_Results', '/', *global_model_name ]
+
+evaluation:
+  lm_eval: true
+  lm_eval_options:
+    output_path: *output_folder
+    tasks: [ "mmlu","openbookqa", "arc_easy", "winogrande", "hellaswag", "arc_challenge", "piqa", "boolq" ]
+    num_fewshot: 0
+    batch_size: auto
+    max_length: 5120
+  ppl: true
+  ppl_options:
+    output_path: *output_folder
+
+report:
+  use_logger: true
+  logger:
+    log_file_path: !join [ *output_folder, '/', *global_model_name, '.txt' ]

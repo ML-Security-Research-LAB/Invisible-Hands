@@ -1,0 +1,39 @@
+system:
+  device: cuda
+  pipeline:
+    enable_pipeline: false
+    pipeline_nodes: [ 0,1 ]
+    size_mbs: 2
+
+model:
+  name: meta-llama/Llama-2-7b-hf
+  alias: &global_model_name Llama-2-7b-int8
+  torch_dtype: auto    
+  model_peft: false
+  load_in_8bit: true
+  load_in_4bit: false
+
+task:
+  seed: 0
+  task_mode: test
+  output_folder: &output_folder !join ['./Test_Results', '/', *global_model_name ]
+
+evaluation:
+  lm_eval: true
+  lm_eval_options:
+    output_path: *output_folder
+    tasks: [ "mmlu","openbookqa", "arc_easy", "winogrande", "hellaswag", "arc_challenge", "piqa", "boolq" ]
+    num_fewshot: 0
+    batch_size: auto
+    max_length: 5120
+  ppl: true
+  ppl_options:
+    output_path: *output_folder
+
+report:
+  use_logger: true
+  logger:
+    log_file_path: !join [ *output_folder, '/', *global_model_name, '.txt' ]
+
+
+
